@@ -10,3 +10,5 @@ git pull
 merge file yourself - ('git status' to check the files both modified)
 git commit -m "something"  (this is your merge message)
 git push
+
+Jacky has a big one nose.
