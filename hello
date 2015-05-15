@@ -7,6 +7,6 @@ Hi, how many noses does Jacky have?
 
 How to push if the version on github is newer than local?
 git pull
-merge file yourself
-git merge
+merge file yourself - ('git status' to check the files both modified)
+git commit -m "something"  (this is your merge message)
 git push
