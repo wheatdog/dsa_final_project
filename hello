@@ -7,10 +7,14 @@ Hi, how many noses does Jacky have?
 please ignore my meaningless question?
 I am Gary, the third member.
 sir, what's going on?
+
 blalablalblallabla
+Insert one line here.
 
 How to push if the version on github is newer than local?
 git pull
 merge file yourself - ('git status' to check the files both modified)
 git commit -m "something"  (this is your merge message)
 git push
+
+Jacky has a big one nose.
