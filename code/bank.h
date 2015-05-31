@@ -23,7 +23,7 @@ class Account {
 	long long int get_money_amount();
 	int withdraw(long long int money);
 	void deposit(long long int money);
-	void search(string ID);
+	int search(string ID);
 };
 
 class Bank {
@@ -32,12 +32,12 @@ class Bank {
 
 	public:
 	int creat_account();
-	void recommend(bool isExist, string ID, int num);
+	void recommend_and_print_ID(bool isExist, string ID, int num);
 	int delete_account();
 	int login(string ID, string passwd, Account* &ptrAccount);
 	int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
 	int transfer(Account* ptrFromAccount, string toAccountID, long long int money);
-	void find_wildcard_ID(string wildcardID);
+	void find_and_print_wildcard_ID(string wildcardID);
 
 };
 enum result {
