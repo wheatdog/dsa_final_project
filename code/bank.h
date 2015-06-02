@@ -7,8 +7,7 @@
 
 using namespace std;
 
-typedef Money long long int;
-typedef HistoryList vector<Record>;
+typedef long long int Money;
 
 class Record {
     // NOTE: to this account, From => true, TO => false
@@ -16,6 +15,8 @@ class Record {
     Money money; 
     unsigned long long int time;
 };
+
+typedef vector<Record> HistoryList;
 
 class Account {
     string ID;
