@@ -13,7 +13,9 @@ class Bank;
 
 typedef long long int Money;
 typedef unsigned long long int Time;
-typedef vector<Record> HistoryList;
+
+// TODO(wheatdog): maybe a link list?
+typedef vector<Record> HistoryList; 
 
 class Record {
     // NOTE: to this account, From => true, TO => false
