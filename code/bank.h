@@ -4,20 +4,21 @@
 
 using namespace std;
 
-typedef Money long long int;
-typedef HistoryList vector<Record>;
+typedef long long int Money;
 
 class Record {
 	Money money; // NOTE: + => transfer money from this account
                      //       - => receive money from other
-        unsigned Money time;
+        unsigned long long int time;
 };
+
+typedef vector<Record> HistoryList;
 
 class Account {
 	string ID;
 	string passwd;
 	Money money;
-	Map<string, HistoryList> history;
+	map<string, HistoryList> history;
 
 	public:
 	Money get_money_amount();
@@ -28,7 +29,7 @@ class Account {
 
 class Bank {
 	int numAccount;
-	Map<string, Account> data;
+	map<string, Account> data;
         unsigned long long int history_counter;
 
 	public:
