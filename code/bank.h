@@ -28,7 +28,7 @@ class Account {
 
 class Bank {
 	int numAccount;
-	Map<Account> data;
+	Map<string, Account> data;
         unsigned long long int history_counter;
 
 	public:
