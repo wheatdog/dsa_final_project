@@ -7,16 +7,20 @@
 
 using namespace std;
 
+class Record;
+class Account;
+class Bank;
+
 typedef long long int Money;
+typedef unsigned long long int Time;
+typedef vector<Record> HistoryList;
 
 class Record {
     // NOTE: to this account, From => true, TO => false
     bool type; 
     Money money; 
-    unsigned long long int time;
+    Time time;
 };
-
-typedef vector<Record> HistoryList;
 
 class Account {
     string ID;
@@ -34,7 +38,7 @@ class Account {
 class Bank {
     int numAccount;
     map<string, Account> data;
-    unsigned long long int history_counter;
+    Time history_counter;
 
     public:
 
