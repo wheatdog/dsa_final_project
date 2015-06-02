@@ -1,35 +1,34 @@
 #include <vector>
 #include <string>
+#include <map>
 
 using namespace std;
 
-class Record {
-	long long int money; // NOTE: + => transfer money from this account
-                             //       - => receive money from other
-        unsigned long long int time;
-};
+typedef Money long long int;
+typedef HistoryList vector<Record>;
 
-class History {
-	string targetID;
-	vector<Record> list;
+class Record {
+	Money money; // NOTE: + => transfer money from this account
+                     //       - => receive money from other
+        unsigned Money time;
 };
 
 class Account {
 	string ID;
 	string passwd;
-	long long int money;
-	Tree<History> history;
+	Money money;
+	Map<string, HistoryList> history;
 
 	public:
-	long long int get_money_amount();
-	int withdraw(long long int money);
-	void deposit(long long int money);
+	Money get_money_amount();
+	int withdraw(Money _money);
+	void deposit(Money _money);
 	int search(string ID);
 };
 
 class Bank {
 	int numAccount;
-	Tree<Account> data;
+	Map<Account> data;
         unsigned long long int history_counter;
 
 	public:
@@ -40,7 +39,7 @@ class Bank {
         void find_and_print_wildcard_ID(string wildcardID); // NOTE: maybe a more efficient way?
 
         int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
-	int transfer(Account* ptrFromAccount, string toAccountID, long long int money);
+	int transfer(Account* ptrFromAccount, string toAccountID, Money _money);
 
 };
 
