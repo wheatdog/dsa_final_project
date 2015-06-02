@@ -22,7 +22,7 @@ class Account {
     string ID;
     string passwd;
     Money money;
-    Map<string, HistoryList> history;
+    map<string, HistoryList> history;
 
     public:
     Money get_money_amount();
@@ -33,10 +33,12 @@ class Account {
 
 class Bank {
     int numAccount;
-    Map<string, Account> data;
+    map<string, Account> data;
     unsigned long long int history_counter;
 
     public:
+
+    Bank();
 
     // TODO: check if ID exist, otherwise create.
     int create_account(string ID, string password);
@@ -50,7 +52,8 @@ class Bank {
     int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
     int transfer(Account* ptrFromAccount, string toAccountID, Money _money);
 
-    friend class Account, Record;
+    friend class Account; 
+    friend class Record;
 };
 
 enum result {

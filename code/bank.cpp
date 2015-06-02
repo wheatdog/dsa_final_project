@@ -42,6 +42,12 @@ int Account::search(string ID)
     return SUCCESS;
 }
 
+Bank::Bank()
+{
+   numAccount = 0;
+   history_counter = 0;
+}
+
 int Bank::merge(string IDFormer, string passwdFormer, 
                 string IDLatter, string passwdLatter)
 {
