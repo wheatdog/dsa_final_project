@@ -1,18 +1,22 @@
 CPPC = g++ 
 CPPFLAGS = -O2 -std=c++11 -Wall
-TARGET = main
+BINDIR = ./bin
+TARGETS = main
 
-all: $(TARGET)
+PREFIX_TARGET = $(addprefix $(BINDIR)/,$(TARGETS))
 
-%: %.c
+all: $(PREFIX_TARGET)
+
+$(BINDIR)/%: %.c
 	gcc $(CFLAGS) $< -o $@
 
-%: %.cpp
+$(BINDIR)/%: %.cpp
 	g++ $(CPPFLAGS) $< -o $@
 
-main: main.cpp bank.h
+$(BINDIR)/main: main.cpp bank.h
 	$(CPPC) $(CPPFLAGS) $< -o $@
 
 clean:
-	rm $(TARGET)
+	rm $(PREFIX_TARGET)
 
+.PHONY: all clean distclean
