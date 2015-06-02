@@ -62,8 +62,8 @@ class Bank {
 
 enum result {
     SUCCESS, FAIL,
-    ID_NOT_FOUNT, WRONG_PASSWD,  // for login, delete, transfer
-    ID1_NOT_FOUNT, WRONG_PASSWD1, ID2_NOT_FOUNT, WRONG_PASSWD2,  // for merge
+    ID_NOT_FOUND, WRONG_PASSWD,  // for login, delete, transfer
+    ID1_NOT_FOUND, WRONG_PASSWD1, ID2_NOT_FOUND, WRONG_PASSWD2,  // for merge
     ID_EXIST,  // for create
     NO_RECORD  // for search
 };
