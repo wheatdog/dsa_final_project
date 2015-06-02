@@ -2,6 +2,7 @@
 #include<string>
 #include<cstring>
 #include"bank.h"
+#include"bank.cpp"
 
 using namespace std;
 
