@@ -1,6 +1,7 @@
 #include <bank.h>
 #include <map>
 #include <iostream>
+#include <assert>
 
 Money Account::get_money_amount()
 {
@@ -42,8 +43,58 @@ int Account::search(string ID)
 }
 
 int Bank::merge(string IDFormer, string passwdFormer, 
-            string IDLatter, string passwdLatter)
+                string IDLatter, string passwdLatter)
 {
+    Map<string, Account>::iterator former_pos = data.find(IDFormer);
+
+    if (former_pos == data.end())
+        return ID1_NOT_FOUNT;
+
+    Map<string, Account>::iterator latter_pos = data.find(IDFormer);
+
+    if (latter_pos == data.end())
+        return ID2_NOT_FOUNT;
+
+    // TODO(wheatdog): MD5
+    if (SOMETHING_MD5(passwdFormer) != former_pos->passwd)
+        return WRONG_PASSWD1;
+    
+    // TODO(wheatdog): MD5
+    if (SOMETHING_MD5(passwdLatter) != latter_pos->passwd)
+        return WRONG_PASSWD2;
+    
+    former_pos->money += latter_pos->money;
+
+    for (Map<string, HistoryList>::iterator 
+            itLatter = latter_pos->history.begin();
+         itLatter != latter_pos->history.end();
+         ++itLatter)
+    {
+        Map<string, HistoryList>::iterator itFormer = 
+            former_pos->history.find(itLatter->first);
+
+        if (itFormer == former_pos->history.end()) {
+            former_pos->history.insert(itLatter, next(itLatter));
+            continue;
+        }
+
+        HistoryList old(itTarget->begin(), itTarget->end());
+
+        HistoryList::iterator itHLFormer = itFormer->begin();
+        HistoryList::iterator itHLLatter = itLatter->begin();
+
+        while ((itHLFormer != itFormer->end()) &&
+                (itHLLatter != itLatter->end())) {
+            if ()
+        }
+
+
+    }
+
+    // TODO(wheatdog): may use a iterator one instead
+    delete_account(IDLatter, passwdLatter); 
+
+    return SUCCESS;
 }
 
 void update_record(Map<string, Account>::iterator target_pos, 
@@ -64,13 +115,16 @@ void update_record(Map<string, Account>::iterator target_pos,
     }
 
     HistoryList newList(1, out);
-    target_pos->history.insert(newList);
+    target_pos->history.insert(
+            pair<string, HistoryList>(ptrFromAccount->ID, newList);
 
     return;
 }
 
 int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
 {
+    assert(_money >= 0);
+
     if (_money > ptrFromAccount->money)
         return FAIL;
 
