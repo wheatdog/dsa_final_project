@@ -54,12 +54,12 @@ int Bank::merge(string IDFormer, string passwdFormer,
     Map<string, Account>::iterator former_pos = data.find(IDFormer);
 
     if (former_pos == data.end())
-        return ID1_NOT_FOUNT;
+        return ID1_NOT_FOUND;
 
     Map<string, Account>::iterator latter_pos = data.find(IDFormer);
 
     if (latter_pos == data.end())
-        return ID2_NOT_FOUNT;
+        return ID2_NOT_FOUND;
 
     // TODO(wheatdog): MD5
     if (SOMETHING_MD5(passwdFormer) != former_pos->passwd)
@@ -71,6 +71,7 @@ int Bank::merge(string IDFormer, string passwdFormer,
     
     former_pos->money += latter_pos->money;
 
+    // NOTE(wheatdog): merge histories
     for (Map<string, HistoryList>::iterator 
             itLatter = latter_pos->history.begin();
          itLatter != latter_pos->history.end();
@@ -85,19 +86,41 @@ int Bank::merge(string IDFormer, string passwdFormer,
         }
 
         HistoryList old(itTarget->begin(), itTarget->end());
-
+        HistoryList out;
         HistoryList::iterator itHLFormer = itFormer->begin();
         HistoryList::iterator itHLLatter = itLatter->begin();
 
+        out.reserve(itFormer->size() + itLatter->size());
+
         while ((itHLFormer != itFormer->end()) &&
                 (itHLLatter != itLatter->end())) {
-            if ()
+            if (*itHLFormer < *itHLLatter) {
+                out.push_back(*itHLFormer);
+                ++itHLFormer;
+            }
+            else {
+                out.push_back(*itHLLatter);
+                ++itHLLatter;
+            }
         }
 
+        while (itHLFormer != itFormer->end()) {
+                out.push_back(*itHLFormer);
+                ++itHLFormer;
+        }
 
+        while (itHLLatter != itLatter->end()) {
+                out.push_back(*itHLLatter);
+                ++itHLLatter;
+        }
     }
 
-    // TODO(wheatdog): may use a iterator one instead
+    // NOTE(wheatdog): change transfer history...
+
+
+
+    // NOTE(wheatdog): delete account here
+    // TODO(wheatdog): seach id again... maybe use a iterator one instead
     delete_account(IDLatter, passwdLatter); 
 
     return SUCCESS;
@@ -138,7 +161,7 @@ int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
 
     if (position == data.end()) {
         recommend_and_print_ID(0, toAccountID, 10);
-        return ID_NOT_FOUNT;
+        return ID_NOT_FOUND;
     }
 
     target_pos->money += _money;
