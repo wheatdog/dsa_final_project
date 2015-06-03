@@ -1,8 +1,8 @@
 CPPC = g++ 
 CPPFLAGS = -O2 -std=c++11 -Wall
 BINDIR = ./bin
-TARGETS = newmain #main
-OBJ = bank.o newmain.o
+TARGETS = main
+OBJ = bank.o main.o
 
 PREFIX_TARGET = $(addprefix $(BINDIR)/,$(TARGETS))
 PREFIX_OBJ = $(addprefix $(BINDIR)/,$(OBJ))
@@ -21,10 +21,7 @@ $(BINDIR)/%: %.c
 $(BINDIR)/%: %.cpp
 	g++ $(CPPFLAGS) $< -o $@
 
-$(BINDIR)/main: main.cpp bank.h
-	$(CPPC) $(CPPFLAGS) $< -o $@
-
-$(BINDIR)/newmain: $(PREFIX_OBJ)
+$(BINDIR)/main: $(PREFIX_OBJ)
 	$(CPPC) $(CPPFLAGS) $(PREFIX_OBJ) -o $@
 
 clean:
