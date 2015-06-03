@@ -1,217 +1,264 @@
 #include<iostream>
 #include<string>
-#include<cstring>
 #include"bank.h"
-#include"bank.cpp"
 
 using namespace std;
 
-int main(){
+enum COMMAND {_LOGIN, _CREATE, _DELETE, _MERGE, _DEPOSIT,
+              _WITHDRAW, _TRANSFER, _FIND, _SEARCH};
 
-    string input;
-    int Login = 0;
-    char command[9][9] = {"login", "create", "delete", "merge", 
-    "deposit", "withdraw", "transfer", "find", "search"};
-    
+int GetCommand(string &Input)
+{
+    const string Command[] = 
+    {"login", "create", "delete", "merge", "deposit",
+        "withdraw", "transfer", "find", "search"};
+    for (unsigned int i = 0; i < sizeof(Command) / sizeof(*Command); i++)
+    {
+        if (Input.compare(Command[i]) == 0)
+            return i;
+    }
+    return -1;
+}
+
+int main() 
+{
+    string Input;
     Bank bank;
+    Account* account = NULL;
 
-    while(getline(cin, input)){
-            char *cstring;
-            char *tmp;
-            int i;
-            cstring = new char[input.size() + 1];
-            strncpy(cstring, input.c_str(), input.size() + 1);
-            tmp = strtok(cstring, " ");
+    while (cin >> Input) {
+        switch(GetCommand(Input)) {
+            case _LOGIN:
+            {
+                string ID, passwd;
+                cin >> ID >> passwd;
+                int status = bank.login(ID, passwd, account);
 
-            for( i = 0; i < 9; i++)
-               if(strcmp(tmp, command[i]) == 0)
-                   break;
-
-            if(i >= 4 && Login == 0){
-                cout << "Not Log in yet or invalid command" << endl;
-                break;
-            }
-
-            switch (i) {
-                case 0:
-                    { 
-                    tmp = strtok(NULL, " ");
-                    string ID(tmp);
-                    tmp = strtok(NULL, " ");
-                    string Password(tmp);
-                    //Account* acptr;
-                    switch (/*bank.login(ID, Password, acptr)*/) { 
-                        case SUCCESS:
-                            cout << "success" << endl;
-                            break;
-                        case ID_NOT_FOUND:
-                            cout << "ID " << ID << " not found" << endl;
-                            break;
-                        case WRONG_PASSWD:
-                            cout << "wrong password" << endl;    
-                            break;
-                        default:
-                            cout << "something unexpected for login" << endl;
-                    }
-                    }
-                    break;
-
-                case 1:
+                switch (status) { 
+                    case SUCCESS:
                     {
-                    tmp = strtok(NULL, " ");
-                    string ID(tmp);
-                    tmp = strtok(NULL, " ");
-                    string Password(tmp);
+                        cout << "success" << endl;
+                    } break;
+
+                    case ID_NOT_FOUND:
+                    {
+                        cout << "ID " << ID << " not found" << endl;
+                    } break;
+
+                    case WRONG_PASSWD:
+                    {
+                        cout << "wrong password" << endl;    
+                    } break;
+
+                    default:
+                    {
+                        cout << "something unexpected for login" << endl;
+                    } break;
+                }
+            } break;
+
+            case _CREATE:
+            {
+                string ID, passwd;
+                cin >> ID >> passwd;
+                int status = bank.create_account(ID, passwd);
+
+                switch (status) {
+                    case SUCCESS:
+                    {
+                        cout << "success" << endl;
+                    } break;
+
+                    case ID_EXIST:
+                    {
+                        cout << "ID " << ID << " exists, ";
+                        bank.recommend_and_print_ID(true, ID, 10);
+                    } break;
+
+                    default:
+                    {
+                        cout << "something unexpected for create" << endl;
+                    }
+                }
+            } break;
+
+            case _DELETE:
+            {
+                string ID, passwd;
+                cin >> ID >> passwd;
+                int status = bank.delete_account(ID, passwd);
+
+                switch (status){
+                    case SUCCESS:
+                    {
+                        cout << "success" << endl;
+                    } break;
+
+                    case ID_NOT_FOUND:
+                    {
+                        cout << "ID " << ID << " not found" << endl;
+                    } break;
+
+                    case WRONG_PASSWD:
+                    {
+                        cout << "wrong password" << endl;    
+                    } break;
+
+                    default:
+                    {
+                        cout << "something unexpected for delete" << endl;
+                    } break;
+                }
+            } break;
+
+            case _MERGE:
+            {
+                string ID1, passwd1;
+                string ID2, passwd2;
+
+                cin >> ID1 >> passwd1;
+                cin >> ID2 >> passwd2;
+                int status = bank.merge(ID1, passwd1, ID2, passwd2);
+
+                switch (status) {
+                    case SUCCESS:
+                    {
+                        // TODO: merge method should return or fill in money for output
+                        cout << "success, " << ID1 << " has " << " " << " dollars" << endl;
+                    } break;
+
+                    case ID1_NOT_FOUND:
+                    {
+                        cout << "ID " << ID1 << " not found" << endl;
+                    } break;
+
+                    case WRONG_PASSWD1:
+                    {
+                        cout << "wrong password1" << endl;    
+                    } break;
+
+                    case ID2_NOT_FOUND:
+                    {
+                        cout << "ID " << ID2 << " not found" << endl;
+                    } break;
+
+                    case WRONG_PASSWD2:
+                    {
+                        cout << "wrong password2" << endl;    
+                    } break;
+
+                    default:
+                    {
+                        cout << "something unexpected for merge" << endl;
+                    } break;
+                }
+            } break;
+
+            case _DEPOSIT:
+            {
+                Money money;
+                cin >> money;
+                account->deposit(money);
+                cout << "success, " << account->get_money_amount() << " dollars in current account" << endl;
+            } break;
+
+            case _WITHDRAW:
+            {
+                Money money;
+                cin >> money;
+
+                int status = account->withdraw(money);
+
+                switch(status) {
+                    case SUCCESS:
+                    {
+                        cout << "success, " << account->get_money_amount() << " dollars left in current account" << endl;
+                    } break;
                     
-                    switch (/*bank.create_account(ID, Password)*/){
-                        case SUCCESS:
-                            cout << "success" << endl;
-                            break;
-                        case ID_EXIST:
-                            {
-                            cout << "ID " << ID << " exists, ";
-                            bank.recommend_and_print_ID;
-                            }
-                            break;
-                        default:
-                            cout << "something unexpected for create" << endl;
-                    }
-                    }
-                    break;
-                
-                case 2:
+                    case FAIL:
                     {
-                    tmp = strtok(NULL, " ");
-                    string ID(tmp);
-                    tmp = strtok(NULL, " ");
-                    string Password(tmp);
+                        cout << "fail, " << account->get_money_amount() << " dollars only in current account" << endl;
+                    } break;
+
+                    default:
+                    {
+                        cout << "something unexpected for withdraw" << endl;
+                    } break;
+                }    
+            } break;
+
+            case _TRANSFER:
+            {
+                string ID;
+                Money money;
+
+                cin >> ID >> money;
                     
-                    switch (/*bank.delete_account(ID, Password)*/){
-                        case SUCCESS:
-                            cout << "success" << endl;
-                            break;
-                        case ID_NOT_FOUND:
-                            cout << "ID " << ID << " not found" << endl;
-                            break;
-                        case WRONG_PASSWD:
-                            cout << "wrong password" << endl;    
-                            break;
-                        default:
-                            cout << "something unexpected for delete" << endl;
-                    }
-                    }
-                    break;
+                int status = bank.transfer(account, ID, money);
 
-                case 3:
+                switch(status) {
+                    case SUCCESS:
                     {
-                    tmp = strtok(NULL, " ");
-                    string ID1(tmp);
-                    tmp = strtok(NULL, " ");
-                    string Password1(tmp);
-                    tmp = strtok(NULL, " ");
-                    string ID2(tmp);
-                    tmp = strtok(NULL, " ");
-                    string Password2(tmp);
-                    
-                    switch (/*bank.merge(ID1, Password1, ID2, Password2)*/){
-                        case SUCCESS:
-                            cout << "success, " << ID1 << " has " << /*function call */ << " dollars" << endl;
-                            break;
-                        case ID1_NOT_FOUND:
-                            cout << "ID " << ID1 << " not found" << endl;
-                            break;
-                        case WRONG_PASSWD1:
-                            cout << "wrong password1" << endl;    
-                            break;
-                         case ID2_NOT_FOUND:
-                            cout << "ID " << ID2 << " not found" << endl;
-                            break;
-                        case WRONG_PASSWD2:
-                            cout << "wrong password2" << endl;    
-                            break;
-                        default:
-                            cout << "something unexpected for merge" << endl;
-                    }
-                    }
-                    break;
+                        cout << "success, " << account->get_money_amount() << " dollars left in current account" << endl;
+                    } break;
 
-                case 4:
+                    case ID_NOT_FOUND:
                     {
-                    tmp = strtok(NULL, " ");
-                    Money num = atoll(tmp);
-                    // bank.Account.deposit(num);
-                    cout << "success, " << /*bank.Account.get_money_amount()*/ << " dollars in current account" << endl;
-                    }
-                    break;
+                        cout << "ID " << ID << " not found" << endl;
+                    } break;
 
-                case 5:
+                    case FAIL:
                     {
-                    tmp = strtok(NULL, " ");
-                    Money num = atoll(tmp);
-                    switch(/*bank.Account.withdraw(num)*/){
-                        case SUCCESS:
-                            cout << "success, " << bank.Account.get_money_amount() << " dollars left in current account" << endl;
-                            break;
-                        case FAIL:
-                            cout << "fail, " << bank.Account.get_money_amount() << " dollars only in current account" << << endl;
-                            break;
-                        default:
-                            cout << "something unexpected for withdraw" << endl;
-                    }    
-                    }
-                    break;
+                        cout << "fail, " << account->get_money_amount() << " dollars only in current account" << endl;
+                    } break;
 
-                case 6:
+                    default:
                     {
-                    tmp = strtok(NULL, " ");
-                    string ID(tmp);
-                    tmp = strtok(NULL, " ");
-                    Money num = atoll(tmp);
-                    
-                    switch(/*bank.transfer((&bank.Account), ID, num)*/){
-                        case SUCCESS:
-                            cout << "success, " << /*bank.Account.get_money_amount()*/ << " dollars left in current account" << endl;
-                            break;
-                        case ID_NOT_FOUND:
-                            cout << "ID " << ID << " not found" << endl;
-                            break;
-                        case FAIL:
-                            cout << "fail, " << /*bank.Account.get_money_amount()*/ << " dollars only in current account" << << endl;
-                            break;
-                        default:
-                            cout << "something unexpected for transfer" << endl;
+                        cout << "something unexpected for transfer" << endl;
                     }
-                    }
-                    break;
-    
-                case 7:
-                    {
-                    tmp = strtok(NULL, " ");
-                    string WildcardID(tmp);
-                    //find_and_print_wildcard_ID(WildcardID);
-                    }
-                    break;
+                }
 
-                case 8:
+            } break;
+
+            case _FIND:
+            {
+                string wildcardID;
+
+                cin >> wildcardID;
+                bank.find_and_print_wildcard_ID(wildcardID);
+            } break;
+
+            case _SEARCH:
+            {
+                string ID;
+                cin >> ID;
+
+                int status = account->search(ID);
+                switch(status) {
+                    case ID_NOT_FOUND:
                     {
-                    tmp = strtok(NULL, " ");
-                    string ID(tmp);
-                    switch(/*bank.Account.search(ID)*/){
-                        case ID_NOT_FOUND:
-                            cout << "ID " << ID << " not found" << endl;
-                            break;
-                        case NO_RECORD:
-                            cout << "no record" << endl;
-                            break;
-                        default:
-                            cout << "something unexpected for search" << endl;
-                    }
-                    }
-                    break;
-        
-                default:
-                    cout << "invalid command" << endl;
-            }                    
-    }  
+                        cout << "ID " << ID << " not found" << endl;
+                    } break;
+
+                    case NO_RECORD:
+                    {
+                        cout << "no record" << endl;
+                    } break;
+
+                    default:
+                    {
+                        cout << "something unexpected for search" << endl;
+                    } break;
+                }
+            } break;
+
+            default:
+            {
+                // TODO: maybe output usage.
+                cout << "invalid command" << endl;
+            } break;
+        }
+    }
+
     return 0;
 }

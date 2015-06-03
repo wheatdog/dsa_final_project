@@ -180,11 +180,8 @@ int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
     map<string, Account>::iterator target_pos = data.find(toAccountID);
     Account* ptrToAccount = &(target_pos->second);
 
-    if (target_pos == data.end()) {
-        // TODO(wheatdog): uncomment this, after implement this function!!!
-        //recommend_and_print_ID(0, toAccountID, 10);
+    if (target_pos == data.end())
         return ID_NOT_FOUND;
-    }
 
     ptrToAccount->money += _money;
     ptrFromAccount->money -= _money;
