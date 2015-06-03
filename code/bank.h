@@ -26,7 +26,7 @@ class Record {
     friend class Account;
     friend class Bank;
     friend void update_record(Account* ptrToAccount, Account* ptrFromAccount,
-                   Money money, bool type, long long int history_counter);
+                   Money money, bool type, Time history_counter);
 };
 
 class Account {
@@ -44,7 +44,7 @@ class Account {
 
     friend class Bank;
     friend void update_record(Account* ptrToAccount, Account* ptrFromAccount,
-                   Money money, bool type, long long int history_counter);
+                   Money money, bool type, Time history_counter);
 };
 
 class Bank {

@@ -110,11 +110,9 @@ int Bank::merge(string IDFormer, string passwdFormer,
     if (latter_pos == data.end())
         return ID2_NOT_FOUND;
 
-    // TODO(wheatdog): MD5
     if (md5(passwdFormer) != former_pos->second.passwd)
         return WRONG_PASSWD1;
     
-    // TODO(wheatdog): MD5
     if (md5(passwdLatter) != latter_pos->second.passwd)
         return WRONG_PASSWD2;
     
@@ -180,7 +178,7 @@ int Bank::merge(string IDFormer, string passwdFormer,
 
 // TODO(wheatdog): maybe change this to a privite method of class Bank?
 void update_record(Account* ptrToAccount, Account* ptrFromAccount,
-                   Money _money, bool type, long long int history_counter)
+                   Money _money, bool type, Time history_counter)
 {
     map<string, HistoryList>::iterator source_pos =
         ptrToAccount->history.find(ptrFromAccount->ID);
