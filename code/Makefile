@@ -4,27 +4,27 @@ BINDIR = ./bin
 TARGETS = main
 OBJ = bank.o main.o
 
+CREATE_BINDIR = mkdir -p $(BINDIR)
+RM = rm -rf
+
 PREFIX_TARGET = $(addprefix $(BINDIR)/,$(TARGETS))
 PREFIX_OBJ = $(addprefix $(BINDIR)/,$(OBJ))
 
 all: $(PREFIX_TARGET)
 
-$(BINDIR)/%.o:%.c
+$(BINDIR)/%.o: %.c
+	@$(CREATE_BINDIR)
 	$(CC) $(CFLAGS) $< -c -o $@
 
-$(BINDIR)/%.o:%.cpp
+$(BINDIR)/%.o: %.cpp
+	@$(CREATE_BINDIR)
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-$(BINDIR)/%: %.c
-	gcc $(CFLAGS) $< -o $@
-
-$(BINDIR)/%: %.cpp
-	g++ $(CPPFLAGS) $< -o $@
-
 $(BINDIR)/main: $(PREFIX_OBJ)
+	@$(CREATE_BINDIR)
 	$(CPPC) $(CPPFLAGS) $(PREFIX_OBJ) -o $@
 
 clean:
-	rm $(PREFIX_TARGET)
+	$(RM) $(BINDIR)
 
-.PHONY: all clean distclean
+.PHONY: all clean
