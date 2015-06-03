@@ -36,7 +36,7 @@ class Account {
     map<string, HistoryList> history;
 
     public:
-    Acount(string initID, string initPasswd);
+    Account(string initID, string initPasswd);
     Money get_money_amount();
     int withdraw(Money _money);
     void deposit(Money _money);
@@ -50,7 +50,7 @@ class Account {
 class Bank {
     int numAccount;
     map<string, Account> data;
-    time history_counter;
+    Time history_counter;
 
     public:
 

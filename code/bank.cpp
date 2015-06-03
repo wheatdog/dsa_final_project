@@ -3,15 +3,9 @@
 #include <cassert>
 #include <iterator>
 #include "bank.h"
+#include "md5.h"
 
 using namespace std;
-
-// TODO(wheatdog): include real one instead.
-int SOMETHING_MD5(string s)
-{
-    return 1;
-}
-
 
 Money Account::get_money_amount()
 {
@@ -76,11 +70,11 @@ int Bank::merge(string IDFormer, string passwdFormer,
         return ID2_NOT_FOUND;
 
     // TODO(wheatdog): MD5
-    if (SOMETHING_MD5(passwdFormer) != SOMETHING_MD5(former_pos->second.passwd))
+    if (md5(passwdFormer) != former_pos->second.passwd)
         return WRONG_PASSWD1;
     
     // TODO(wheatdog): MD5
-    if (SOMETHING_MD5(passwdLatter) != SOMETHING_MD5(latter_pos->second.passwd))
+    if (md5(passwdLatter) != latter_pos->second.passwd)
         return WRONG_PASSWD2;
     
     former_pos->second.money += latter_pos->second.money;
