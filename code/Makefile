@@ -2,7 +2,7 @@ CPPC = g++
 CPPFLAGS = -O2 -std=c++11 -Wall
 BINDIR = ./bin
 TARGETS = main
-OBJ = bank.o main.o
+OBJ = bank.o main.o md5.o
 
 CREATE_BINDIR = mkdir -p $(BINDIR)
 RM = rm -rf

@@ -7,6 +7,11 @@
 
 using namespace std;
 
+
+Account::Account(string initID, string initPasswd): ID(initID), money(0){
+    passwd = md5(initPasswd);
+}
+
 Money Account::get_money_amount()
 {
     return money;
@@ -54,6 +59,42 @@ Bank::Bank()
 {
    numAccount = 0;
    history_counter = 0;
+}
+
+int Bank::create_account(string ID, string password) {
+    if(data.count(ID) != 0)
+	    return ID_EXIST;
+
+    Account newAccount(ID, password);
+    data.insert(pair<string, Account>(ID, newAccount));
+    
+    // NOTE(wheatdog): can this work?
+    // data[ID] = newAccount;
+    return SUCCESS;
+}
+
+int Bank::delete_account(string ID, string password) {
+    map<string, Account>::iterator it = data.find(ID);
+    if(it == data.end())
+	    return ID_NOT_FOUND;
+
+    if(it->second.passwd != md5(password))
+	    return WRONG_PASSWD;
+
+    data.erase(it);
+    return SUCCESS;
+}
+
+int Bank::login(string ID, string passwd, Account* &ptrAccount){
+    map<string, Account>::iterator it = data.find(ID);
+    if(it == data.end())
+	    return ID_NOT_FOUND;
+
+    if(it->second.passwd != md5(passwd))
+	    return WRONG_PASSWD;
+
+    ptrAccount = &(it->second);
+    return SUCCESS;
 }
 
 int Bank::merge(string IDFormer, string passwdFormer, 
