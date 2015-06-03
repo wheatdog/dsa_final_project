@@ -1,7 +1,17 @@
-#include <bank.h>
 #include <map>
 #include <iostream>
-#include <assert>
+#include <cassert>
+#include <iterator>
+#include "bank.h"
+
+using namespace std;
+
+// TODO(wheatdog): include real one instead.
+int SOMETHING_MD5(string s)
+{
+    return 1;
+}
+
 
 Money Account::get_money_amount()
 {
@@ -17,26 +27,30 @@ int Account::withdraw(Money _money)
     return SUCCESS;
 }
 
-int Account::deposit(Money _money)
+void Account::deposit(Money _money)
 {
     money += _money;
-    return SUCCESS;
+    return;
 }
 
 int Account::search(string ID)
 {
-    Map<string, HistoryList>::iterator position = history.find(ID);
+    map<string, HistoryList>::iterator position = history.find(ID);
 
-    if (position == data.end())
+    if (position == history.end())
         return FAIL;
 
     if (history.empty())
         return NO_RECORD;
 
-    for (vector<Record>::iterator it = position->begin(),
-         it != history.end(),
+    for (vector<Record>::iterator it = position->second.begin();
+         it != position->second.end();
          ++it) {
-        cout << (it->type == FROM)? "From " : "To " << ID << it->money << endl;
+        if (it->type == FROM)
+            cout << "From ";
+        else
+            cout << "To "; 
+        cout << ID << it->money << endl;
     }
 
     return SUCCESS;
@@ -51,50 +65,52 @@ Bank::Bank()
 int Bank::merge(string IDFormer, string passwdFormer, 
                 string IDLatter, string passwdLatter)
 {
-    Map<string, Account>::iterator former_pos = data.find(IDFormer);
+    map<string, Account>::iterator former_pos = data.find(IDFormer);
 
     if (former_pos == data.end())
         return ID1_NOT_FOUND;
 
-    Map<string, Account>::iterator latter_pos = data.find(IDFormer);
+    map<string, Account>::iterator latter_pos = data.find(IDFormer);
 
     if (latter_pos == data.end())
         return ID2_NOT_FOUND;
 
     // TODO(wheatdog): MD5
-    if (SOMETHING_MD5(passwdFormer) != former_pos->passwd)
+    if (SOMETHING_MD5(passwdFormer) != SOMETHING_MD5(former_pos->second.passwd))
         return WRONG_PASSWD1;
     
     // TODO(wheatdog): MD5
-    if (SOMETHING_MD5(passwdLatter) != latter_pos->passwd)
+    if (SOMETHING_MD5(passwdLatter) != SOMETHING_MD5(latter_pos->second.passwd))
         return WRONG_PASSWD2;
     
-    former_pos->money += latter_pos->money;
+    former_pos->second.money += latter_pos->second.money;
 
     // NOTE(wheatdog): merge histories
-    for (Map<string, HistoryList>::iterator 
-            itLatter = latter_pos->history.begin();
-         itLatter != latter_pos->history.end();
+    for (map<string, HistoryList>::iterator 
+            itLatter = latter_pos->second.history.begin();
+         itLatter != latter_pos->second.history.end();
          ++itLatter)
     {
-        Map<string, HistoryList>::iterator itFormer = 
-            former_pos->history.find(itLatter->first);
+        map<string, HistoryList>::iterator itFormer = 
+            former_pos->second.history.find(itLatter->first);
 
-        if (itFormer == former_pos->history.end()) {
-            former_pos->history.insert(itLatter, next(itLatter));
+        if (itFormer == former_pos->second.history.end()) {
+            map<string, HistoryList>::iterator itUp = itLatter;
+            ++itUp;
+            former_pos->second.history.insert(itLatter, itUp);
             continue;
         }
 
-        HistoryList old(itTarget->begin(), itTarget->end());
+        HistoryList old(itFormer->second.begin(), itFormer->second.end());
         HistoryList out;
-        HistoryList::iterator itHLFormer = itFormer->begin();
-        HistoryList::iterator itHLLatter = itLatter->begin();
+        HistoryList::iterator itHLFormer = itFormer->second.begin();
+        HistoryList::iterator itHLLatter = itLatter->second.begin();
 
-        out.reserve(itFormer->size() + itLatter->size());
+        out.reserve(itFormer->second.size() + itLatter->second.size());
 
-        while ((itHLFormer != itFormer->end()) &&
-                (itHLLatter != itLatter->end())) {
-            if (*itHLFormer < *itHLLatter) {
+        while ((itHLFormer != itFormer->second.end()) &&
+                (itHLLatter != itLatter->second.end())) {
+            if (itHLFormer->time < itHLLatter->time) {
                 out.push_back(*itHLFormer);
                 ++itHLFormer;
             }
@@ -104,12 +120,12 @@ int Bank::merge(string IDFormer, string passwdFormer,
             }
         }
 
-        while (itHLFormer != itFormer->end()) {
+        while (itHLFormer != itFormer->second.end()) {
                 out.push_back(*itHLFormer);
                 ++itHLFormer;
         }
 
-        while (itHLLatter != itLatter->end()) {
+        while (itHLLatter != itLatter->second.end()) {
                 out.push_back(*itHLLatter);
                 ++itHLLatter;
         }
@@ -121,54 +137,60 @@ int Bank::merge(string IDFormer, string passwdFormer,
 
     // NOTE(wheatdog): delete account here
     // TODO(wheatdog): seach id again... maybe use a iterator one instead
-    delete_account(IDLatter, passwdLatter); 
+    // uncomment this after implement this function!!
+    //delete_account(IDLatter, passwdLatter); 
 
     return SUCCESS;
 }
 
-void update_record(Map<string, Account>::iterator target_pos, 
-                   Account* ptrFromAccount,
-                   Money money, bool type, long long int history_counter)
+// TODO(wheatdog): maybe change this to a privite method of class Bank?
+void update_record(Account* ptrToAccount, Account* ptrFromAccount,
+                   Money _money, bool type, long long int history_counter)
 {
-    Map<string, HistoryList>::iterator source_pos =
-        target_pos->history.find(ptrFromAccount->ID);
+    map<string, HistoryList>::iterator source_pos =
+        ptrToAccount->history.find(ptrFromAccount->ID);
 
     Record out;
     out.type = type;
     out.money = _money;
     out.time = history_counter;
 
-    if (source_pos != target_pos->history.end()) {
-        source_pos->push_back(out);
+    // NOTE(wheatdog): if name is found in history list
+    if (source_pos != ptrToAccount->history.end()) {
+        source_pos->second.push_back(out);
         return;
     }
 
+    // NOTE(wheatdog): if not found, insert one in the list
     HistoryList newList(1, out);
-    target_pos->history.insert(
-            pair<string, HistoryList>(ptrFromAccount->ID, newList);
+    ptrToAccount->history.insert(
+            pair<string, HistoryList>(ptrFromAccount->ID, newList));
 
     return;
 }
 
 int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
 {
+    // TODO(wheatdog): check if necessary?
     assert(_money >= 0);
 
     if (_money > ptrFromAccount->money)
         return FAIL;
 
-    Map<string, Account>::iterator target_pos = data.find(ID);
+    map<string, Account>::iterator target_pos = data.find(toAccountID);
+    Account* ptrToAccount = &(target_pos->second);
 
-    if (position == data.end()) {
-        recommend_and_print_ID(0, toAccountID, 10);
+    if (target_pos == data.end()) {
+        // TODO(wheatdog): uncomment this, after implement this function!!!
+        //recommend_and_print_ID(0, toAccountID, 10);
         return ID_NOT_FOUND;
     }
 
-    target_pos->money += _money;
+    ptrToAccount->money += _money;
     ptrFromAccount->money -= _money;
 
-    update_record(target_pos, ptrFromAccount, _money, TO, history_counter++);
-    update_record(ptrFromAccount, target_pos, _money, FROM, history_counter++);
+    update_record(ptrToAccount, ptrFromAccount, _money, TO, history_counter++);
+    update_record(ptrFromAccount, ptrToAccount, _money, FROM, history_counter++);
 
     return SUCCESS;
 }

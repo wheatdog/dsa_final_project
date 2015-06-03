@@ -22,6 +22,11 @@ class Record {
     bool type; 
     Money money; 
     Time time;
+
+    friend class Account;
+    friend class Bank;
+    friend void update_record(Account* ptrToAccount, Account* ptrFromAccount,
+                   Money money, bool type, long long int history_counter);
 };
 
 class Account {
@@ -35,6 +40,10 @@ class Account {
     int withdraw(Money _money);
     void deposit(Money _money);
     int search(string ID);
+
+    friend class Bank;
+    friend void update_record(Account* ptrToAccount, Account* ptrFromAccount,
+                   Money money, bool type, long long int history_counter);
 };
 
 class Bank {
@@ -58,8 +67,6 @@ class Bank {
     int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
     int transfer(Account* ptrFromAccount, string toAccountID, Money _money);
 
-    friend class Account; 
-    friend class Record;
 };
 
 enum result {
