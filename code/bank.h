@@ -25,8 +25,6 @@ class Record {
 
     friend class Account;
     friend class Bank;
-    friend void update_record(Account* ptrToAccount, Account* ptrFromAccount,
-                   Money money, bool type, Time history_counter);
 };
 
 class Account {
@@ -43,8 +41,6 @@ class Account {
     int search(string ID);
 
     friend class Bank;
-    friend void update_record(Account* ptrToAccount, Account* ptrFromAccount,
-                   Money money, bool type, Time history_counter);
 };
 
 class Bank {
@@ -52,6 +48,10 @@ class Bank {
     map<string, Account> data;
     Time history_counter;
 
+    void update_record(Account* ptrToAccount, Account* ptrFromAccount,
+                       Money money, bool type, Time history_counter);
+    void merge_history(map<string, HistoryList>::iterator itFormer, 
+                             map<string, HistoryList>::iterator itLatter);
     public:
 
     Bank();
