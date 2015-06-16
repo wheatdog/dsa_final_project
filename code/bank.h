@@ -74,7 +74,7 @@ class Bank {
     void find_and_print_wildcard_ID(string wildcardID);
 
     int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
-    int transfer(map<string, Account>::iterator ptrFromAccount,
+    int transfer(Account* ptrFromAccount,
                  string toAccountID, Money _money);
 
 };

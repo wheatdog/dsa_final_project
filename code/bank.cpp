@@ -162,6 +162,7 @@ int Bank::merge(string IDFormer, string passwdFormer,
             continue;
         }
 
+        // TODO(wheatdog): maybe do the merge when search
         itFormer->second.first.merge(itLatter->second.first);
     }
 
@@ -200,23 +201,22 @@ void Bank::update_record(map<string, Account>::iterator ptrToAccount,
        
 }
 
-int Bank::transfer(map<string, Account>::iterator ptrFromAccount,
-                   string toAccountID, Money _money)
+int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
 {
 
-    if (_money > ptrFromAccount->second.money)
+    if (_money > ptrFromAccount->money)
         return FAIL;
 
-    map<string, Account>::iterator ptrToAccount = data.find(toAccountID);
-
-    if (ptrToAccount == data.end())
+    map<string, Account>::iterator itToAccount = data.find(toAccountID);
+    map<string, Account>::iterator itFromAccount = data.find((ptrFromAccount->ID));
+    if (itToAccount == data.end())
         return ID_NOT_FOUND;
 
-    ptrToAccount->second.money += _money;
-    ptrFromAccount->second.money -= _money;
+    itToAccount->second.money += _money;
+    itFromAccount->second.money -= _money;
 
-    update_record(ptrToAccount, ptrFromAccount, _money, TO, history_counter++);
-    update_record(ptrFromAccount, ptrToAccount, _money, FROM, history_counter++);
+    update_record(itToAccount, itFromAccount, _money, TO, history_counter++);
+    update_record(itFromAccount, itToAccount, _money, FROM, history_counter++);
 
     return SUCCESS;
 }
