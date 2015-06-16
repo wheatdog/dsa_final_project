@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 Account::Account(string initID, string initPasswd): ID(initID), money(0){
     passwd = md5(initPasswd);
 }

@@ -13,8 +13,6 @@ class Bank;
 
 typedef long long int Money;
 typedef unsigned long long int Time;
-
-// TODO(wheatdog): maybe a link list?
 typedef pair<list<Record>,map<string,Account>::iterator> HistoryList; 
 
 class Record {
@@ -63,16 +61,11 @@ class Bank {
     public:
 
     Bank();
-
-    // TODO: check if ID exist, otherwise create.
     int create_account(string ID, string password);
     void recommend_and_print_ID(bool isExist, string ID, int num); 
     int delete_account(string ID, string password); 
     int login(string ID, string passwd, Account* &ptrAccount); 
-   
-    // NOTE: maybe a more efficient way?
     void find_and_print_wildcard_ID(string wildcardID);
-
     int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
     int transfer(Account* ptrFromAccount,
                  string toAccountID, Money _money);
