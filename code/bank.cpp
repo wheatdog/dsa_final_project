@@ -96,11 +96,10 @@ int Bank::login(string ID, string passwd, Account* &ptrAccount){
     return SUCCESS;
 }
 
-void Bank::change_record(map<string, HistoryList>::iterator itLatter,
+void Bank::change_record(Account* tofixAccount,
                          map<string, Account>::iterator former_pos,
                          string IDFormer, string IDLatter)
 {
-        Account* tofixAccount = &(itLatter->second.second->second);
         map<string, HistoryList>::iterator tar_history_it = 
             tofixAccount->history.find(IDLatter);
         map<string, HistoryList>::iterator fin_history_it = 
@@ -108,21 +107,22 @@ void Bank::change_record(map<string, HistoryList>::iterator itLatter,
 
         if (fin_history_it != tofixAccount->history.end()) {
             fin_history_it->second.first.merge(tar_history_it->second.first);
+            tofixAccount->history.erase(tar_history_it);
+            return;
         }
-        else {
-            HistoryList tmp; 
-            tmp.second = former_pos;
 
-            pair<map<string, HistoryList>::iterator,bool> ret = 
-                tofixAccount->history.insert(
+        HistoryList tmp; 
+        tmp.second = former_pos;
+
+        pair<map<string, HistoryList>::iterator,bool> ret = 
+            tofixAccount->history.insert(
                     pair<string, HistoryList>(IDFormer, tmp));
 
-            // NOTE(wheatdog): swap list
-            swap(tmp.first, ret.first->second.first);
-        }
+        // NOTE(wheatdog): swap list to avoid copy whole list
+        swap(tmp.first, ret.first->second.first);
 
         tofixAccount->history.erase(tar_history_it);
-       
+        return;
 }
 
 int Bank::merge(string IDFormer, string passwdFormer, 
@@ -149,7 +149,8 @@ int Bank::merge(string IDFormer, string passwdFormer,
     {
 
         // NOTE(wheatdog): change transfer history...
-        change_record(itLatter, former_pos, IDFormer, IDLatter);
+        Account* tofixAccount = &(itLatter->second.second->second);
+        change_record(tofixAccount, former_pos, IDFormer, IDLatter);
 
         // NOTE(wheatdog): merge history
         map<string, HistoryList>::iterator itFormer = 

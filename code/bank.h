@@ -57,7 +57,7 @@ class Bank {
                        map<string, Account>::iterator ptrFromAccount,
                        Money money, bool type, Time history_counter);
 
-    void change_record(map<string, HistoryList>::iterator itLatter,
+    void change_record(Account* tofixAccount,
                        map<string, Account>::iterator former_pos,
                        string IDFormer, string IDLatter);
     public:
