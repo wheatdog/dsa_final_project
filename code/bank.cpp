@@ -42,9 +42,8 @@ int Account::search(string ID)
     if (history.empty())
         return NO_RECORD;
 
-    for (vector<Record>::iterator it = position->second.begin();
-         it != position->second.end();
-         ++it) {
+    list<Record> curlist = position->second.first;
+    for (list<Record>::iterator it = curlist.begin(); it != curlist.end(); ++it) {
         if (it->type == FROM)
             cout << "From ";
         else
@@ -97,38 +96,33 @@ int Bank::login(string ID, string passwd, Account* &ptrAccount){
     return SUCCESS;
 }
 
-void Bank::merge_history(map<string, HistoryList>::iterator itFormer, 
-                         map<string, HistoryList>::iterator itLatter)
+void Bank::change_record(map<string, HistoryList>::iterator itLatter,
+                         map<string, Account>::iterator former_pos,
+                         string IDFormer, string IDLatter)
 {
-    HistoryList old(itFormer->second.begin(), itFormer->second.end());
-    HistoryList::iterator itHLFormer = itFormer->second.begin();
-    HistoryList::iterator itHLLatter = itLatter->second.begin();
-    HistoryList out;
-    out.reserve(itFormer->second.size() + itLatter->second.size());
+        Account* tofixAccount = &(itLatter->second.second->second);
+        map<string, HistoryList>::iterator tar_history_it = 
+            tofixAccount->history.find(IDLatter);
+        map<string, HistoryList>::iterator fin_history_it = 
+            tofixAccount->history.find(IDFormer);
 
-    while ((itHLFormer != itFormer->second.end()) &&
-            (itHLLatter != itLatter->second.end())) {
-        if (itHLFormer->time < itHLLatter->time) {
-            out.push_back(*itHLFormer);
-            ++itHLFormer;
+        if (fin_history_it != tofixAccount->history.end()) {
+            fin_history_it->second.first.merge(tar_history_it->second.first);
         }
         else {
-            out.push_back(*itHLLatter);
-            ++itHLLatter;
+            HistoryList tmp; 
+            tmp.second = former_pos;
+
+            pair<map<string, HistoryList>::iterator,bool> ret = 
+                tofixAccount->history.insert(
+                    pair<string, HistoryList>(IDFormer, tmp));
+
+            // NOTE(wheatdog): swap list
+            swap(tmp.first, ret.first->second.first);
         }
-    }
 
-    while (itHLFormer != itFormer->second.end()) {
-        out.push_back(*itHLFormer);
-        ++itHLFormer;
-    }
-
-    while (itHLLatter != itLatter->second.end()) {
-        out.push_back(*itHLLatter);
-        ++itHLLatter;
-    }
-
-    return;
+        tofixAccount->history.erase(tar_history_it);
+       
 }
 
 int Bank::merge(string IDFormer, string passwdFormer, 
@@ -137,7 +131,6 @@ int Bank::merge(string IDFormer, string passwdFormer,
     map<string, Account>::iterator former_pos = data.find(IDFormer);
     if (former_pos == data.end())
         return ID1_NOT_FOUND;
-
     map<string, Account>::iterator latter_pos = data.find(IDFormer);
     if (latter_pos == data.end())
         return ID2_NOT_FOUND;
@@ -149,26 +142,28 @@ int Bank::merge(string IDFormer, string passwdFormer,
     former_pos->second.money += latter_pos->second.money;
 
     // NOTE(wheatdog): merge histories
-    for (map<string, HistoryList>::iterator 
-            itLatter = latter_pos->second.history.begin();
+    for (map<string, HistoryList>::iterator itLatter =
+            latter_pos->second.history.begin();
          itLatter != latter_pos->second.history.end();
          ++itLatter)
     {
+
+        // NOTE(wheatdog): change transfer history...
+        change_record(itLatter, former_pos, IDFormer, IDLatter);
+
+        // NOTE(wheatdog): merge history
         map<string, HistoryList>::iterator itFormer = 
             former_pos->second.history.find(itLatter->first);
 
         if (itFormer == former_pos->second.history.end()) {
-            map<string, HistoryList>::iterator itUp = itLatter;
-            ++itUp;
-            former_pos->second.history.insert(itLatter, itUp);
+            map<string, HistoryList>::iterator itLatterUp = itLatter;
+            ++itLatterUp;
+            former_pos->second.history.insert(itLatter, itLatterUp);
             continue;
         }
 
-        merge_history(itFormer, itLatter);
+        itFormer->second.first.merge(itLatter->second.first);
     }
-
-    // NOTE(wheatdog): change transfer history...
-
 
     // NOTE(wheatdog): delete account here
     data.erase(latter_pos);
@@ -176,12 +171,12 @@ int Bank::merge(string IDFormer, string passwdFormer,
     return SUCCESS;
 }
 
-// TODO(wheatdog): maybe change this to a privite method of class Bank?
-void Bank::update_record(Account* ptrToAccount, Account* ptrFromAccount,
+void Bank::update_record(map<string, Account>::iterator ptrToAccount,
+                         map<string, Account>::iterator ptrFromAccount,
                          Money _money, bool type, Time history_counter)
 {
-    map<string, HistoryList>::iterator source_pos =
-        ptrToAccount->history.find(ptrFromAccount->ID);
+    map<string, HistoryList>::iterator target_pos =
+        ptrToAccount->second.history.find(ptrFromAccount->second.ID);
 
     Record out;
     out.type = type;
@@ -189,33 +184,36 @@ void Bank::update_record(Account* ptrToAccount, Account* ptrFromAccount,
     out.time = history_counter;
 
     // NOTE(wheatdog): if name is found in history list
-    if (source_pos != ptrToAccount->history.end()) {
-        source_pos->second.push_back(out);
+    if (target_pos != ptrToAccount->second.history.end()) {
+            target_pos->second.first.push_back(out);
         return;
+           
     }
 
     // NOTE(wheatdog): if not found, insert one in the list
-    HistoryList newList(1, out);
-    ptrToAccount->history.insert(
-            pair<string, HistoryList>(ptrFromAccount->ID, newList));
+    list<Record> tmp(1, out);
+    HistoryList newList =  make_pair(tmp, ptrFromAccount);
+    ptrToAccount->second.history.insert(
+            pair<string, HistoryList>(ptrFromAccount->second.ID, newList));
 
     return;
+       
 }
 
-int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
+int Bank::transfer(map<string, Account>::iterator ptrFromAccount,
+                   string toAccountID, Money _money)
 {
 
-    if (_money > ptrFromAccount->money)
+    if (_money > ptrFromAccount->second.money)
         return FAIL;
 
-    map<string, Account>::iterator target_pos = data.find(toAccountID);
-    Account* ptrToAccount = &(target_pos->second);
+    map<string, Account>::iterator ptrToAccount = data.find(toAccountID);
 
-    if (target_pos == data.end())
+    if (ptrToAccount == data.end())
         return ID_NOT_FOUND;
 
-    ptrToAccount->money += _money;
-    ptrFromAccount->money -= _money;
+    ptrToAccount->second.money += _money;
+    ptrFromAccount->second.money -= _money;
 
     update_record(ptrToAccount, ptrFromAccount, _money, TO, history_counter++);
     update_record(ptrFromAccount, ptrToAccount, _money, FROM, history_counter++);

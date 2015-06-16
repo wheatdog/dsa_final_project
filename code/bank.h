@@ -1,4 +1,4 @@
-#include <vector>
+#include <list>
 #include <string>
 #include <map>
 
@@ -15,7 +15,7 @@ typedef long long int Money;
 typedef unsigned long long int Time;
 
 // TODO(wheatdog): maybe a link list?
-typedef vector<Record> HistoryList; 
+typedef pair<list<Record>,map<string,Account>::iterator> HistoryList; 
 
 class Record {
     // NOTE: to this account, From => true, TO => false
@@ -23,6 +23,11 @@ class Record {
     Money money; 
     Time time;
 
+    public:
+    bool operator< (const Record& b)
+    {
+        return (time < b.time);
+    }
     friend class Account;
     friend class Bank;
 };
@@ -48,10 +53,13 @@ class Bank {
     map<string, Account> data;
     Time history_counter;
 
-    void update_record(Account* ptrToAccount, Account* ptrFromAccount,
+    void update_record(map<string, Account>::iterator ptrToAccount,
+                       map<string, Account>::iterator ptrFromAccount,
                        Money money, bool type, Time history_counter);
-    void merge_history(map<string, HistoryList>::iterator itFormer, 
-                             map<string, HistoryList>::iterator itLatter);
+
+    void change_record(map<string, HistoryList>::iterator itLatter,
+                       map<string, Account>::iterator former_pos,
+                       string IDFormer, string IDLatter);
     public:
 
     Bank();
@@ -66,7 +74,8 @@ class Bank {
     void find_and_print_wildcard_ID(string wildcardID);
 
     int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
-    int transfer(Account* ptrFromAccount, string toAccountID, Money _money);
+    int transfer(map<string, Account>::iterator ptrFromAccount,
+                 string toAccountID, Money _money);
 
 };
 
