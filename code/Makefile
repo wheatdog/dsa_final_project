@@ -18,7 +18,7 @@ $(BINDIR)/%.o: %.c
 
 $(BINDIR)/%.o: %.cpp
 	@$(CREATE_BINDIR)
-	$(CXX) $(CXXFLAGS) $< -c -o $@
+	$(CPPC) $(CPPFLAGS) $< -c -o $@
 
 $(BINDIR)/main: $(PREFIX_OBJ)
 	@$(CREATE_BINDIR)
