@@ -118,6 +118,7 @@ void Bank::change_record(Account* tofixAccount,
                     pair<string, HistoryList>(IDFormer, tmp));
 
         // NOTE(wheatdog): swap list to avoid copy whole list
+        // TODO(wheatdog): see if this is more efficient
         swap(tmp.first, ret.first->second.first);
 
         tofixAccount->history.erase(tar_history_it);
@@ -215,8 +216,9 @@ int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
     itToAccount->second.money += _money;
     itFromAccount->second.money -= _money;
 
-    update_record(itToAccount, itFromAccount, _money, TO, history_counter++);
-    update_record(itFromAccount, itToAccount, _money, FROM, history_counter++);
+    update_record(itToAccount, itFromAccount, _money, TO, history_counter);
+    update_record(itFromAccount, itToAccount, _money, FROM, history_counter);
+    history_counter++;
 
     return SUCCESS;
 }
