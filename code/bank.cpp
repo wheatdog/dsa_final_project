@@ -119,6 +119,7 @@ void Bank::change_record(Account* tofixAccount,
 
         // NOTE(wheatdog): swap list to avoid copy whole list
         // TODO(wheatdog): see if this is more efficient
+        // heap? check heap order when elements are equal.
         swap(tmp.first, ret.first->second.first);
 
         tofixAccount->history.erase(tar_history_it);
@@ -156,6 +157,7 @@ int Bank::merge(string IDFormer, string passwdFormer,
         map<string, HistoryList>::iterator itFormer = 
             former_pos->second.history.find(itLatter->first);
 
+        // TODO(wheatdog): check if this work
         if (itFormer == former_pos->second.history.end()) {
             map<string, HistoryList>::iterator itLatterUp = itLatter;
             ++itLatterUp;
@@ -168,6 +170,7 @@ int Bank::merge(string IDFormer, string passwdFormer,
     }
 
     // NOTE(wheatdog): delete account here
+    // TODO(wheatdog): maybe need a robust test for list , or not...it is STL!
     data.erase(latter_pos);
 
     return SUCCESS;
