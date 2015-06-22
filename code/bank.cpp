@@ -225,3 +225,75 @@ int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
 
     return SUCCESS;
 }
+    
+void Bank::find_and_print_wildcard_ID(string wildcardID)
+{
+    for(map<string, Account>::iterator it = data.begin(); it != data.end(); it++){
+                if(matchwild(wildcardID, (it->first)) == true)
+            cout << it->first << endl;
+    }
+    return;
+}
+bool matchwild(string wstring, string comstring)
+{
+    char *cstr = comstring.c_str();
+    char *wcstr = wstring.c_str();
+    char *mark = (char *) 0;
+    char *wmark = (char *) 0;
+    while (1)
+    {
+        if(*wcstr == '*')
+        {
+            while(*(++wcstr) == '*')
+            {
+            }
+            if(!*wcstr)
+                return true;
+            if(*wcstr != '?')
+            {
+                while(*cstr  != *wcstr)
+                {
+                    if(!(*(++cstr)))
+                        return false;
+                }
+            }
+            mark = cstr;
+            wmark = wcstr;
+        }
+        else if (*cstr != *wcstr && *wcstr != '?')
+        {
+            if(wmark)
+            {
+                if(wcstr != wmark)
+                {
+                    wcstr = wmark;
+                    if(*cstr != *wcstr)
+                    {
+                        cstr = ++mark;
+                        continue;
+                    }
+                    else
+                        wcstr++;
+                }
+                if(*cstr)
+                {
+                    cstr++;
+                    continue;
+                }   
+            }
+            return false;
+        }
+        cstr++;
+        wcstr++;
+        if(!*cstr)
+        {
+            while(*wcstr == '*')
+            {
+                wcstr++;
+            }
+            if(!*wcstr)
+                return true;
+            return false;
+        }
+    }
+}
