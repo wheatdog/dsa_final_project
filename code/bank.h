@@ -59,11 +59,15 @@ class Bank {
                        map<string, Account>::iterator former_pos,
                        string IDFormer, string IDLatter);
     bool matchwild(string wstring, string comstring);
+
+    int extend_str_and_print(bool isExist, int num, string strExtend, int numExtended, int score, const string& str);
+
+    int find_with_score_and_print(bool isExist, int num, string mdfyStr, int reversePos, int numChanged, int lengthRM, int score, const string& str);
     public:
 
     Bank();
     int create_account(string ID, string password);
-    void recommend_and_print_ID(bool isExist, string ID, int num);
+    void recommend_and_print_ID(bool isExist, const string& ID, int num);
     int delete_account(string ID, string password);
     int login(string ID, string passwd, Account* &ptrAccount);
     void find_and_print_wildcard_ID(string wildcardID);

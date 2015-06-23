@@ -72,7 +72,7 @@ int main()
                     case ID_EXIST:
                     {
                         cout << "ID " << ID << " exists, ";
-                        bank.recommend_and_print_ID(true, ID, 10);
+                        bank.recommend_and_print_ID(false, ID, 10);
                     } break;
 
                     default:
@@ -204,7 +204,8 @@ int main()
 
                     case ID_NOT_FOUND:
                     {
-                        cout << "ID " << ID << " not found" << endl;
+                        cout << "ID " << ID << " not found, ";
+                        bank.recommend_and_print_ID(true, ID, 10);
                     } break;
 
                     case FAIL:
