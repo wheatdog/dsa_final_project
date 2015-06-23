@@ -46,7 +46,7 @@ int Account::search(string ID)
         if (it->type == FROM)
             cout << "From ";
         else
-            cout << "To "; 
+            cout << "To ";
         cout << ID << it->money << endl;
     }
 
@@ -61,11 +61,11 @@ Bank::Bank()
 
 int Bank::create_account(string ID, string password) {
     if(data.count(ID) != 0)
-	    return ID_EXIST;
+        return ID_EXIST;
 
     Account newAccount(ID, password);
     data.insert(pair<string, Account>(ID, newAccount));
-    
+
     // NOTE(wheatdog): can this work?
     // data[ID] = newAccount;
     return SUCCESS;
@@ -74,10 +74,10 @@ int Bank::create_account(string ID, string password) {
 int Bank::delete_account(string ID, string password) {
     map<string, Account>::iterator it = data.find(ID);
     if(it == data.end())
-	    return ID_NOT_FOUND;
+        return ID_NOT_FOUND;
 
     if(it->second.passwd != md5(password))
-	    return WRONG_PASSWD;
+        return WRONG_PASSWD;
 
     data.erase(it);
     return SUCCESS;
@@ -86,10 +86,10 @@ int Bank::delete_account(string ID, string password) {
 int Bank::login(string ID, string passwd, Account* &ptrAccount){
     map<string, Account>::iterator it = data.find(ID);
     if(it == data.end())
-	    return ID_NOT_FOUND;
+        return ID_NOT_FOUND;
 
     if(it->second.passwd != md5(passwd))
-	    return WRONG_PASSWD;
+        return WRONG_PASSWD;
 
     ptrAccount = &(it->second);
     return SUCCESS;
@@ -99,9 +99,9 @@ void Bank::change_record(Account* tofixAccount,
                          map<string, Account>::iterator former_pos,
                          string IDFormer, string IDLatter)
 {
-        map<string, HistoryList>::iterator tar_history_it = 
+        map<string, HistoryList>::iterator tar_history_it =
             tofixAccount->history.find(IDLatter);
-        map<string, HistoryList>::iterator fin_history_it = 
+        map<string, HistoryList>::iterator fin_history_it =
             tofixAccount->history.find(IDFormer);
 
         if (fin_history_it != tofixAccount->history.end()) {
@@ -110,10 +110,10 @@ void Bank::change_record(Account* tofixAccount,
             return;
         }
 
-        HistoryList tmp; 
+        HistoryList tmp;
         tmp.second = former_pos;
 
-        pair<map<string, HistoryList>::iterator,bool> ret = 
+        pair<map<string, HistoryList>::iterator,bool> ret =
             tofixAccount->history.insert(
                     pair<string, HistoryList>(IDFormer, tmp));
 
@@ -126,7 +126,7 @@ void Bank::change_record(Account* tofixAccount,
         return;
 }
 
-int Bank::merge(string IDFormer, string passwdFormer, 
+int Bank::merge(string IDFormer, string passwdFormer,
                 string IDLatter, string passwdLatter)
 {
     map<string, Account>::iterator former_pos = data.find(IDFormer);
@@ -139,7 +139,7 @@ int Bank::merge(string IDFormer, string passwdFormer,
         return WRONG_PASSWD1;
     if (md5(passwdLatter) != latter_pos->second.passwd)
         return WRONG_PASSWD2;
-    
+
     former_pos->second.money += latter_pos->second.money;
 
     // NOTE(wheatdog): merge histories
@@ -154,7 +154,7 @@ int Bank::merge(string IDFormer, string passwdFormer,
         change_record(tofixAccount, former_pos, IDFormer, IDLatter);
 
         // NOTE(wheatdog): merge history
-        map<string, HistoryList>::iterator itFormer = 
+        map<string, HistoryList>::iterator itFormer =
             former_pos->second.history.find(itLatter->first);
 
         // TODO(wheatdog): check if this work
@@ -192,7 +192,7 @@ void Bank::update_record(map<string, Account>::iterator ptrToAccount,
     if (target_pos != ptrToAccount->second.history.end()) {
             target_pos->second.first.push_back(out);
         return;
-           
+
     }
 
     // NOTE(wheatdog): if not found, insert one in the list
@@ -202,7 +202,7 @@ void Bank::update_record(map<string, Account>::iterator ptrToAccount,
             pair<string, HistoryList>(ptrFromAccount->second.ID, newList));
 
     return;
-       
+
 }
 
 int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
@@ -225,7 +225,7 @@ int Bank::transfer(Account* ptrFromAccount, string toAccountID, Money _money)
 
     return SUCCESS;
 }
-    
+
 void Bank::find_and_print_wildcard_ID(string wildcardID)
 {
     for(map<string, Account>::iterator it = data.begin(); it != data.end(); it++){
@@ -234,12 +234,15 @@ void Bank::find_and_print_wildcard_ID(string wildcardID)
     }
     return;
 }
-bool matchwild(string wstring, string comstring)
+
+// NOTE(gary):
+// http://www.drdobbs.com/architecture-and-design/matching-wildcards-an-empirical-way-to-t/240169123
+bool Bank::matchwild(string wstring, string comstring)
 {
-    char *cstr = comstring.c_str();
-    char *wcstr = wstring.c_str();
-    char *mark = (char *) 0;
-    char *wmark = (char *) 0;
+    string::iterator cstr = comstring.begin();
+    string::iterator wcstr = wstring.begin();
+    string::iterator mark, wmark;
+
     while (1)
     {
         if(*wcstr == '*')
@@ -262,7 +265,7 @@ bool matchwild(string wstring, string comstring)
         }
         else if (*cstr != *wcstr && *wcstr != '?')
         {
-            if(wmark)
+            if(wmark != wstring.end())
             {
                 if(wcstr != wmark)
                 {
@@ -279,7 +282,7 @@ bool matchwild(string wstring, string comstring)
                 {
                     cstr++;
                     continue;
-                }   
+                }
             }
             return false;
         }

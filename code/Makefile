@@ -1,4 +1,4 @@
-CPPC = g++ 
+CPPC = g++
 CPPFLAGS = -O2 -std=c++11 -Wall
 BINDIR = ./bin
 TARGETS = main

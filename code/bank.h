@@ -13,12 +13,12 @@ class Bank;
 
 typedef long long int Money;
 typedef unsigned long long int Time;
-typedef pair<list<Record>,map<string,Account>::iterator> HistoryList; 
+typedef pair<list<Record>,map<string,Account>::iterator> HistoryList;
 
 class Record {
     // NOTE: to this account, From => true, TO => false
-    bool type; 
-    Money money; 
+    bool type;
+    Money money;
     Time time;
 
     public:
@@ -58,13 +58,14 @@ class Bank {
     void change_record(Account* tofixAccount,
                        map<string, Account>::iterator former_pos,
                        string IDFormer, string IDLatter);
+    bool matchwild(string wstring, string comstring);
     public:
 
     Bank();
     int create_account(string ID, string password);
-    void recommend_and_print_ID(bool isExist, string ID, int num); 
-    int delete_account(string ID, string password); 
-    int login(string ID, string passwd, Account* &ptrAccount); 
+    void recommend_and_print_ID(bool isExist, string ID, int num);
+    int delete_account(string ID, string password);
+    int login(string ID, string passwd, Account* &ptrAccount);
     void find_and_print_wildcard_ID(string wildcardID);
     int merge(string IDFormer, string passwdFormer, string IDLatter, string passwdLatter);
     int transfer(Account* ptrFromAccount,
