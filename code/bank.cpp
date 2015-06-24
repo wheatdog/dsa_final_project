@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cassert>
 #include <iterator>
+#include <algorithm>
 #include <cmath>
 #include "bank.h"
 #include "md5.h"
@@ -417,11 +418,43 @@ int Bank::find_with_score_and_print(bool isExist, int num, string mdfyStr, int r
 	}
 	return numPrinted;
 }
+static bool compare_score(const StrAndScore& f, const StrAndScore& l){
+	return (f.score < l.score);
+}
+int Bank::count_score(const string& strF, const string& strL){
+	int commonLength = min(strF.size(), strL.size());
+	int diffLength = abs(strF.size() - strL.size());
+	int score = (1 + diffLength)*diffLength/2;
+	for(int i = 0; i < commonLength; i++){
+		if(strF[i] != strL[i])
+			score += (commonLength - i);
+	}
+	return score;
+}
 
+void Bank::sort_score_and_print(int num, const string& str){
+	vector<StrAndScore> scoreTable;
+	scoreTable.reserve(data.size() + 1);
+
+	for(map<string, Account>::iterator it = data.begin(); it != data.end(); ++it){
+		scoreTable.push_back(StrAndScore(it, count_score(it->first, str)));
+	}
+	stable_sort(scoreTable.begin(), scoreTable.end(), compare_score);
+	if(data.size() < (unsigned int)num)
+		num = data.size();
+	vector<StrAndScore>::iterator it = scoreTable.begin();
+	for(int i = 1; i <= num; ++i, ++it){
+		cout << (it->mapIt->first) << ((i == num)? '\n':',');
+	}
+}
 void Bank::recommend_and_print_ID(bool isExist, const string& ID, int num){
         int score = 1;
-        while(num > 0){
-            num -= find_with_score_and_print(isExist, num, ID, min(score, ID.length()), 0, 0, score, ID);
-                score++;
-        }
+	if(isExist){
+		sort_score_and_print(num, ID);
+	}else{
+		while(num > 0){
+			num -= find_with_score_and_print(isExist, num, ID, min(score, ID.length()), 0, 0, score, ID);
+			score++;
+		}
+	}
 }

@@ -10,7 +10,14 @@ int Bank::create_account(string ID, string password){
     data[ID] = newAccount;
     return SUCCESS;
 }
-void Bank::recommend_and_print_ID(bool isExist, string ID, int num);
+
+void Bank::recommend_and_print_ID(bool isExist, const string& ID, int num){
+	int score = 1, numAns = 0;
+	while(numAns < num){
+		numAns += find_with_score_and_print(isExist, ID, score);
+		score++;
+	}
+}
 int Bank::delete_account(string ID, string password){
     map<string, Account>::iterator it = data.find(ID);
     if(it == data.end())

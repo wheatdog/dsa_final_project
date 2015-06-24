@@ -45,7 +45,12 @@ class Account {
 
     friend class Bank;
 };
+struct StrAndScore{
+    map<string, Account>::iterator mapIt;
+    int score;
 
+    StrAndScore(map<string, Account>::iterator initIt, int initScore): mapIt(initIt), score(initScore){}
+};
 class Bank {
     int numAccount;
     map<string, Account> data;
@@ -61,8 +66,10 @@ class Bank {
     bool matchwild(string wstring, string comstring);
 
     int extend_str_and_print(bool isExist, int num, string strExtend, int numExtended, int score, const string& str);
-
-    int find_with_score_and_print(bool isExist, int num, string mdfyStr, int reversePos, int numChanged, int lengthRM, int score, const string& str);
+    int count_score(const string& strF, const string& strL);
+    void sort_score_and_print(int num, const string& str);
+    int find_with_score_and_print(bool isExist, int num, string mdfyStr, int reversePos,
+                                  int numChanged, int lengthRM, int score, const string& str);
     public:
 
     Bank();
